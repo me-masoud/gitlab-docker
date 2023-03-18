@@ -3,7 +3,7 @@ services:
   web:
     image: 'gitlab/gitlab-ce:latest'
     restart: always
-    hostname: 'git.cashcn.xyz'
+    hostname: 'localhost'
     container_name: gitlab-ce
     environment:
       GITLAB_OMNIBUS_CONFIG: |
@@ -12,9 +12,9 @@ services:
       - '8080:80'
       - '8443:443'
     volumes:
-      - '${PWD}/config:/etc/gitlab'
-      - '${PWD}/logs:/var/log/gitlab'
-      - '${PWD}/data:/var/opt/gitlab'
+      - '$GITLAB_HOME/config:/etc/gitlab'
+      - '$GITLAB_HOME/logs:/var/log/gitlab'
+      - '$GITLAB_HOME/data:/var/opt/gitlab'
     networks:
       - gitlab
   gitlab-runner:
@@ -25,7 +25,7 @@ services:
       - web
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - '${PWD}/gitlab-runner:/etc/gitlab-runner'
+      - '$GITLAB_HOME/gitlab-runner:/etc/gitlab-runner'
     networks:
       - gitlab
 
