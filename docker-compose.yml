@@ -1,54 +1,53 @@
-#version: '3'
-#services:
-#  web:
-#    image: 'gitlab/gitlab-ce:latest'
-#    restart: always
-#    hostname: 'git.cashcn.xyz'
-#    environment:
-#      GITLAB_OMNIBUS_CONFIG: |
-#        external_url 'http://gitlab.example.com:80'
-#        gitlab_rails['gitlab_shell_ssh_port'] = 2224
-#    ports:
-#      - '8004:80'
-#      - '443:443'
-#      - '2224:22'
-#    volumes:
-#      - '/srv/gitlab/config:/etc/gitlab'
-#      - '/srv/gitlab/logs:/var/log/gitlab'
-#      - '/srv/gitlab/data:/var/opt/gitlab'
-
-
-version: '3.7'
+version: '3.9'
 services:
-  web:
-    image: 'gitlab/gitlab-ce:latest'
+  gitlab:
+    image: gitlab/gitlab-ce:latest
     restart: always
-    hostname: 'localhost'
-    container_name: gitlab-ce
+    hostname: gitlab.example.com # Replace with your own hostname
     environment:
       GITLAB_OMNIBUS_CONFIG: |
-        external_url 'http://localhost'
+        external_url 'http://gitlab.example.com' # Replace with your own URL
+        gitlab_rails['smtp_enable'] = true
+        gitlab_rails['smtp_address'] = "smtp.gmail.com"
+        gitlab_rails['smtp_port'] = 587
+        gitlab_rails['smtp_user_name'] = "your_email@gmail.com" # Replace with your own email
+        gitlab_rails['smtp_password'] = "your_email_password" # Replace with your own email password
+        gitlab_rails['smtp_domain'] = "smtp.gmail.com"
+        gitlab_rails['smtp_authentication'] = "login"
+        gitlab_rails['smtp_enable_starttls_auto'] = true
+        gitlab_rails['smtp_tls'] = true
     ports:
-      - '8080:80'
-      - '8443:443'
+      - "8003:80"
+      - "443:443"
+      - "22:22"
     volumes:
-      - '$GITLAB_HOME/config:/etc/gitlab'
-      - '$GITLAB_HOME/logs:/var/log/gitlab'
-      - '$GITLAB_HOME/data:/var/opt/gitlab'
-    networks:
-      - gitlab
+      - ./config:/etc/gitlab
+      - ./logs:/var/log/gitlab
+      - ./data:/var/opt/gitlab
   gitlab-runner:
-    image: gitlab/gitlab-runner:alpine
-    container_name: gitlab-runner
+    image: gitlab/gitlab-runner:latest
     restart: always
-    depends_on:
-      - web
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - '$GITLAB_HOME/gitlab-runner:/etc/gitlab-runner'
-    networks:
-      - gitlab
-
-networks:
-  gitlab:
-    name: gitlab-network
+      - ./config:/etc/gitlab-runner
+    environment:
+      GITLAB_URL: http://gitlab.example.com # Replace with your own URL
+      REGISTRATION_TOKEN: your_registration_token # Replace with your own registration token
+      RUNNER_NAME: gitlab-runner
+      RUNNER_EXECUTOR: docker
+      DOCKER_IMAGE: docker:latest
+      DOCKER_PRIVILEGED: true
+      DOCKER_TLS_CERTDIR: ""
+      DOCKER_RUN_PRIVILEGED: true
+      DOCKER_VOLUMES: "/cache"
+      DOCKER_NETWORK_MODE: "host"
+      DOCKER_EXTRA_HOSTS: "git.cashcn.xyz:127.0.0.1"
+      DOCKER_PORT_BINDINGS: "80:80,443:443"
+      DOCKER_ALLOWED_IMAGES: "your/docker-image:tag"
+      DOCKER_MEMORY_LIMIT: "2g"
+      DOCKER_MEMORY_SWAP_LIMIT: "4g"
+      DOCKER_CPUS: "1"
+      DOCKER_CPU_SET: "0"
+      DOCKER_MEMORY_SWAPPINESS: "0"
+      DOCKER_DISABLE_ENTRYPOINT_OVERWRITE: "true"
+      DOCKER_WAIT_FOR_SERVICES_TIMEOUT: "60"
