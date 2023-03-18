@@ -1,4 +1,4 @@
-version: '3.7'
+version: '3'
 services:
   web:
     image: 'gitlab/gitlab-ce:latest'
@@ -31,4 +31,3 @@ services:
 
 networks:
   gitlab:
-    name: gitlab-network
