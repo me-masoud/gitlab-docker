@@ -9,7 +9,7 @@ services:
         external_url 'http://gitlab.example.com:80'
         gitlab_rails['gitlab_shell_ssh_port'] = 2224
     ports:
-      - '8003:80'
+      - '8004:80'
       - '443:443'
       - '2224:22'
     volumes:
